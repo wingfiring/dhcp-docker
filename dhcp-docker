@@ -1,0 +1,13 @@
+#!/bin/bash
+
+usage(){
+	echo $(basename $0) "<container name or id>"
+	echo " request ip via dhcp"
+	exit 1
+}
+
+[ -n "$1" ] || usage
+
+pid=$(docker inspect -f '{{.State.Pid}}' $1)
+nsenter -t $pid -u -n /bin/bash -c '(ip addr flush dev eth0; dhclient -v eth0)'
+
